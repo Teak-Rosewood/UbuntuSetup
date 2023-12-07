@@ -1,3 +1,0 @@
-FROM nvcr.io/nvidia/tensorrt:23.09-py3
-
-LABEL maintainer "Saatwik Vasishtha  <saatwik.vasishtha@gmail.com>"
