@@ -124,7 +124,7 @@ set $ws5 "5"
 set $ws6 "6:Spotify "
 set $ws7 "7:Social "
 set $ws8 "8:Code "
-set $ws9 "9:Terminal "
+set $ws9 "9:Project "
 set $ws10 "10:Chrome " 
 
 # switch to workspace
@@ -192,7 +192,7 @@ bar {
     font pango: Inconsolata, FontAwesome 9 
     position top
     tray_output none
-    status_command ~/.local/bin/bumblebee-status -m network pasink pasource bluetooth \
+    status_command ~/.local/bin/bumblebee-status -m network pulseout pulsein bluetooth \
         battery date time \
         -p time.format="%H:%M" date.format="%a, %b %d %Y" \
         -t iceberg-dark-powerline 
@@ -206,8 +206,7 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 # Locking screen
-bindsym $mod+shift+x exec betterlockscreen -l dim
-
+bindsym $mod+shift+x exec betterlockscreen -l blur 0.8 
 # Startup applications
 exec discord
 exec spotify
@@ -220,17 +219,17 @@ client.unfocused $inactive-bg-color $inactive-bg-color $inactive-text-color
 client.urgent $urgent-bg-color $urgent-bg-color $text-color 
 
 # Setting up wallpaper
-exec_always feh --bg-scale /home/teak/Pictures/wallpaper.jpg
+exec_always feh --bg-scale /home/blank/Pictures/wallpaper.jpg
 hide_edge_borders both
 
 # Setting up transperency
 exec picom -f
 
 # Setting up duel monitor
-exec_always xrandr --output HDMI-1 --auto --primary --left-of eDP-1
+#exec_always xrandr --output HDMI-1 --auto --primary --left-of eDP-1
 
 # Sending workspace to alternate monitor
-bindsym $mod+m exec i3-msg move workspace to output right
+#bindsym $mod+m exec i3-msg move workspace to output right
 
 # Assigning specific windows for applications
 assign [class="Spotify"] $ws6
@@ -238,4 +237,4 @@ assign [class="Code"] $ws8
 assign [class="discord"] $ws7
 
 # i3lock setup 
-
+bindsym $mod+shift+p exec shutdown -h now
