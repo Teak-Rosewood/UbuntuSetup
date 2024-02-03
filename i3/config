@@ -124,7 +124,7 @@ set $ws5 "5"
 set $ws6 "6:Spotify "
 set $ws7 "7:Social "
 set $ws8 "8:Code "
-set $ws9 "9:Project "
+set $ws9 "9:Project "
 set $ws10 "10:Chrome " 
 
 # switch to workspace
@@ -192,9 +192,11 @@ bar {
     font pango: Inconsolata, FontAwesome 9 
     position top
     tray_output none
-    status_command ~/.local/bin/bumblebee-status -m network pulseout pulsein bluetooth \
-        battery date time \
+    status_command ~/.local/bin/bumblebee-status -m spotify network pulseout pulsein bluetooth \
+        battery date time system \
         -p time.format="%H:%M" date.format="%a, %b %d %Y" \
+        pulseout.autostart="true" \
+        spotify.concise_controls="true" spotify.layout="spotify.song" \
         -t iceberg-dark-powerline 
  }
 
@@ -238,3 +240,7 @@ assign [class="discord"] $ws7
 
 # i3lock setup 
 bindsym $mod+shift+p exec shutdown -h now
+#interactive screenshot by pressing printscreen
+bindsym Print exec gnome-screenshot -i 
+#crop-area screenshot by pressing Mod + printscreen
+bindsym $mod+Print exec gnome-screenshot -a
