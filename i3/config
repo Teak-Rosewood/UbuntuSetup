@@ -197,7 +197,7 @@ bar {
         -p time.format="%H:%M" date.format="%a, %b %d %Y" \
         pulseout.autostart="true" \
         spotify.concise_controls="true" spotify.layout="spotify.song" \
-        -t iceberg-dark-powerline 
+        -t night-powerline
  }
 
 
@@ -228,10 +228,10 @@ hide_edge_borders both
 exec picom -f
 
 # Setting up duel monitor
-#exec_always xrandr --output HDMI-1 --auto --primary --left-of eDP-1
+# exec_always xrandr --output HDMI-1 --auto --primary --left-of eDP-1
 
 # Sending workspace to alternate monitor
-#bindsym $mod+m exec i3-msg move workspace to output right
+bindsym $mod+m exec i3-msg move workspace to output right
 
 # Assigning specific windows for applications
 assign [class="Spotify"] $ws6
@@ -243,4 +243,5 @@ bindsym $mod+shift+p exec shutdown -h now
 #interactive screenshot by pressing printscreen
 bindsym Print exec gnome-screenshot -i 
 #crop-area screenshot by pressing Mod + printscreen
-bindsym $mod+Print exec gnome-screenshot -a
+bindsym $mod+shift+s exec gnome-screenshot -a
+
