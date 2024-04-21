@@ -17,8 +17,14 @@ systemctl enable tlp.service
 sudo tlp start
 ```
 ### Install Lunar Vim
+Install Neo Vim from Source
+```
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+sudo rm -rf /opt/nvim
+sudo tar -C /opt -xzf nvim-linux64.tar.gz
+```
+Add `set PATH "$PATH:/opt/nvim-linux64/bin"` to you `.bashrc` or `config.fish`
 ```bash
-sudo snap install nvim --classic
 LV_BRANCH='release-1.3/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.3/neovim-0.9/utils/installer/install.sh)
 ```
 
