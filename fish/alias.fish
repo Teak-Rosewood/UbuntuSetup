@@ -1,2 +1,5 @@
 alias sql="docker run --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres"
 alias mongo="docker run --name mongodb -p 27017:27017 -d mongodb"
+alias cvat="docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build cvat_opa cvat_db cvat_redis_inmem cvat_redis_ondisk cvat_server"
+alias stop_cvat="docker compose -f docker-compose.yml -f docker-compose.dev.yml down"
+alias c2si_db="docker run --name c2si_server -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=c2si_db -e MYSQL_USER=c2si -e MYSQL_PASSWORD=c2si -d mysql"
