@@ -3,8 +3,8 @@
 
 if pgrep -x wlsunset >/dev/null; then eye="Eye saver: ON  (click to turn off)"; else eye="Eye saver: OFF (click to turn on)"; fi
 
-choice=$(printf '%s\n' "$eye" "Display layout (wdisplays)" \
-    | wofi --dmenu --prompt "" --width 340 --height 130 --cache-file /dev/null)
+choice=$(printf '%s\n' "$eye" "Re-apply docked layout (160Hz, scale)" "Display layout (wdisplays)" \
+    | wofi --dmenu --prompt "" --width 340 --height 160 --cache-file /dev/null)
 
 case "$choice" in
     Eye*)
@@ -13,5 +13,6 @@ case "$choice" in
         else
             setsid wlsunset -t 4500 -T 4600 -S 03:00 -s 03:01 -d 1 >/dev/null 2>&1 &
         fi ;;
+    Re-apply*) setsid -f "$HOME/.config/sway/scripts/dock-apply" >/dev/null 2>&1 ;;
     Display*) wdisplays ;;
 esac

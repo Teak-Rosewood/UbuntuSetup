@@ -47,7 +47,7 @@ Same as i3 unless noted. `$mod` is the Super key.
 | `$mod+m` | send workspace to the other monitor |
 | `$mod+Shift+x` | lock |
 | `$mod+Shift+p` | power menu (was an instant shutdown in i3) |
-| `$mod+Shift+d` | display settings GUI |
+| `$mod+Shift+d` | display menu: eye saver, re-apply docked layout, display GUI |
 | `$mod+Shift+v` | clipboard history |
 | `$mod+Shift+s` / `Print` | screenshot area / full |
 | `$mod+Shift+c` | reload config |
@@ -61,7 +61,7 @@ Everything is reachable from the bar:
 - Audio: click the volume module for pavucontrol, scroll to change volume
 - Brightness: scroll on the brightness module, or the keyboard keys
 - Power profile and battery: shown in the bar
-- Displays: the monitor icon opens wdisplays
+- Displays: the monitor icon opens wdisplays; `$mod+Shift+d` has the display menu
 
 ## Monitors
 `kanshi/config` matches monitors by make/model/serial, not by connector name,
@@ -73,6 +73,29 @@ description with:
 swaymsg -t get_outputs | grep -E 'Output|make|model|serial'
 ```
 Changes made in wdisplays are temporary until written to the kanshi config.
+
+### Shared monitor (switching its input between two laptops)
+The Acer XV272K is shared with a second laptop. Switching its input away often
+does not make the kernel see a disconnect, so Sway keeps driving a dead link and
+the monitor comes back black or stuck at 60Hz. Three pieces handle it:
+- `scripts/dock-watch` (started from `config`) asks the monitor which input is
+  active over DDC/CI. On another input it disables the output, so windows move to
+  the laptop panel. When the input is back it re-enables the output and sends
+  workspaces 9 and 10 home. `HOME_INPUT` at the top is this laptop's input
+  (`ddcutil getvcp 60` while the monitor shows this laptop; HDMI-1 is `x11`).
+- `scripts/dock-apply` brings the output up at 60Hz and then raises it to 160Hz,
+  because enabling straight at 160Hz is rejected (`Atomic commit failed: Invalid
+  argument`). It retries and falls back to 60Hz. kanshi's `docked` profile also
+  runs it, since 160Hz is no longer in the profile.
+- `workspace ... output` rules in `config` give workspaces 9 and 10 the monitor
+  as home and the laptop panel as fallback.
+
+Needs `ddcutil` and DDC/CI enabled in the monitor's on-screen menu. Logs:
+```bash
+journalctl --user -t dock-watch -t dock-apply -b
+```
+If the monitor ever shows nothing, `$mod+Shift+d` then "Re-apply docked layout".
+`swaymsg reload` resets the monitor's scale; run the same menu entry afterwards.
 
 ## Hybrid GPU
 `session/sway-session` makes Sway render on the Intel iGPU and use the NVIDIA

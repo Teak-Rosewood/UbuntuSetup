@@ -6,12 +6,13 @@
 # between GNOME and Sway, so it is matched by name. External monitors are
 # matched by description.
 # Laptop panel + Acer XV272K V5 (4K). Kanshi rejects a whole profile if a mode
-# is missing, and the 160Hz mode is not always offered at boot, so the mode is
-# requested separately and allowed to fail.
+# is missing, and the 160Hz mode is not always offered right after hotplug or an
+# input switch, so the mode is not in the profile. dock-apply sets 160Hz after
+# the profile applies and retries until sway confirms it (see scripts/dock-apply).
 profile docked {
     output eDP-1 mode 3200x2000@165Hz position 0,0 scale 2
     output "Acer Technologies XV272K V5 153102E3F4201" position 1600,0 scale 1.5
-    exec swaymsg output '"Acer Technologies XV272K V5 153102E3F4201"' mode 3840x2160@160Hz
+    exec ~/.config/sway/scripts/dock-apply
 }
 
 # Laptop panel alone
@@ -20,7 +21,8 @@ profile mobile {
 }
 
 # Any other monitor: keep the laptop panel, enable the newcomer at its
-# preferred mode and let Sway place it to the right
+# preferred mode and let Sway place it to the right. No scale is set here, so a
+# 4K panel would come up at scale 1.
 profile unknown-external {
     output eDP-1 enable mode 3200x2000@165Hz position 0,0 scale 2
     output * enable

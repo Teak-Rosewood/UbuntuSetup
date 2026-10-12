@@ -13,6 +13,7 @@ packages=(
     network-manager-gnome blueman pavucontrol brightnessctl playerctl
     grim slurp wl-clipboard cliphist libnotify-bin wlsunset
     power-profiles-daemon
+    ddcutil jq
 )
 
 echo "==> Installing packages"

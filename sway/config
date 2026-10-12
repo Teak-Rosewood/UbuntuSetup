@@ -99,6 +99,14 @@ set $ws8 "8:Code"
 set $ws9 "9:Project"
 set $ws10 "10:Web"
 
+# Workspace homes: 9 and 10 live on the external monitor and fall back to the
+# laptop panel when it is gone (monitor input switched away), then return on
+# their own when it comes back. The monitor is matched by make/model/serial
+# because its connector name (HDMI-A-1/3) changes.
+workspace $ws8 output eDP-1
+workspace $ws9 output "Acer Technologies XV272K V5 153102E3F4201" eDP-1
+workspace $ws10 output "Acer Technologies XV272K V5 153102E3F4201" eDP-1
+
 bindsym $mod+1 workspace number $ws1
 bindsym $mod+2 workspace number $ws2
 bindsym $mod+3 workspace number $ws3
@@ -177,7 +185,7 @@ bindsym $mod+Shift+s exec $scripts/screenshot area
 bindsym $mod+Shift+x exec swaylock -f
 bindsym $mod+Shift+v exec cliphist list | wofi --dmenu | cliphist decode | wl-copy
 bindsym $mod+Shift+p exec $scripts/power-menu
-bindsym $mod+Shift+d exec wdisplays
+bindsym $mod+Shift+d exec $scripts/display-menu
 
 # --- Bar ---
 bar {
@@ -188,11 +196,12 @@ bar {
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK
 exec /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
 exec kanshi
+exec $scripts/dock-watch
 exec mako
 exec nm-applet --indicator
 exec blueman-applet
 exec wl-paste --watch cliphist store
-exec wlsunset -t 4500 -T 6500 -S 07:00 -s 19:00
+exec wlsunset -t 4500 -T 4600 -S 03:00 -s 03:01 -d 1
 exec swayidle -w \
     timeout 300 'swaylock -f' \
     timeout 330 'swaymsg "output * power off"' \

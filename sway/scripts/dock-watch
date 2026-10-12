@@ -1,0 +1,70 @@
+#!/bin/bash
+# Turn the external Acer output off while the monitor is showing the other
+# laptop, and back on (at 160Hz) when it returns to this one.
+#
+# Why: switching the monitor's input does not always make the kernel see a
+# disconnect, so sway keeps driving a link the monitor has dropped. On return the
+# monitor shows nothing or only 60Hz until the cable is replugged. The monitor
+# reports its active input over DDC/CI, so we watch that instead of hotplug.
+#
+# HOME_INPUT is the VCP 0x60 value of the input this laptop's cable is on
+# (find it with: ddcutil getvcp 60 while the monitor shows this laptop).
+# Started from the sway config. Logs: journalctl --user -t dock-watch
+
+SN="153102E3F4201"
+DESC="Acer Technologies XV272K V5 $SN"
+HOME_INPUT="x11" # HDMI-1
+INTERVAL=3
+CONFIRM=2 # consecutive identical readings before acting (ignores switch glitches)
+
+# Workspaces that live on the monitor (same as the `workspace ... output` rules in
+# the sway config). Sway leaves a workspace that is visible on the laptop panel
+# there when the monitor returns, so send them home explicitly.
+HOME_WORKSPACES=("9:Project" "10:Web")
+
+log() { logger -t dock-watch -- "$*"; }
+
+exec 8>"${XDG_RUNTIME_DIR:-/tmp}/dock-watch.lock"
+flock -n 8 || exit 0 # already running
+
+input() { ddcutil --sn "$SN" --noverify getvcp 60 --terse 2>/dev/null | awk '{print $NF}'; }
+active() {
+    swaymsg -t get_outputs 2>/dev/null | jq -r --arg d "$DESC" \
+        '.[] | select(.make + " " + .model + " " + .serial == $d) | .active'
+}
+
+go_home() {
+    local focused ws
+    focused=$(swaymsg -t get_workspaces | jq -r '.[] | select(.focused) | .name')
+    for ws in "${HOME_WORKSPACES[@]}"; do
+        swaymsg -t get_workspaces | jq -e --arg w "$ws" 'any(.[]; .name == $w)' >/dev/null || continue
+        swaymsg "workspace \"$ws\"; move workspace to output \"$DESC\"" >/dev/null 2>&1
+    done
+    [ -n "$focused" ] && swaymsg "workspace \"$focused\"" >/dev/null 2>&1
+}
+
+away=0
+home=0
+log "started, home input $HOME_INPUT"
+while sleep "$INTERVAL"; do
+    now=$(input)
+    [ -n "$now" ] || continue # DDC busy or monitor mid-switch: no opinion
+    is_active=$(active)
+    [ -n "$is_active" ] || continue # output not known to sway
+
+    if [ "$now" = "$HOME_INPUT" ]; then
+        away=0
+        home=$((home + 1))
+        if [ "$is_active" != true ] && [ "$home" -ge "$CONFIRM" ]; then
+            log "monitor back on $now, enabling"
+            "$(dirname "$(readlink -f "$0")")/dock-apply" && go_home
+        fi
+    else
+        home=0
+        away=$((away + 1))
+        if [ "$is_active" = true ] && [ "$away" -ge "$CONFIRM" ]; then
+            log "monitor on input $now (not $HOME_INPUT), disabling output"
+            swaymsg output "\"$DESC\"" disable >/dev/null 2>&1
+        fi
+    fi
+done

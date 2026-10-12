@@ -1,0 +1,70 @@
+#!/bin/bash
+# Make the external Acer monitor come up at 160Hz and the right scale, and keep
+# trying until sway confirms it. Run by kanshi after the `docked` profile and by
+# display-menu for a manual re-apply. Safe to run any time: it exits at once when
+# the monitor is absent or already correct.
+#
+# Why this exists: after the monitor's input is switched away and back, the
+# first modeset often fails (wlroots "Atomic commit failed") because the link is
+# not ready yet. One-shot `swaymsg output ... mode` then leaves it black, at 60Hz
+# or at the wrong scale. Logs: journalctl --user -t dock-apply
+
+DESC="Acer Technologies XV272K V5 153102E3F4201"
+MODE="3840x2160@160Hz"
+FALLBACK_MODE="3840x2160@60Hz"
+WANT_REFRESH=160000
+SCALE=1.5
+ATTEMPTS=10
+
+log() { logger -t dock-apply -- "$*"; }
+
+# Prints "<active> <refresh> <scale>" for the monitor, or nothing if not connected.
+state() {
+    swaymsg -t get_outputs 2>/dev/null | jq -r --arg d "$DESC" '
+        .[] | select(.make + " " + .model + " " + .serial == $d)
+        | "\(.active) \(.current_mode.refresh // 0) \(.scale)"'
+}
+
+good() {
+    local active refresh scale
+    read -r active refresh scale <<<"$(state)"
+    [ "$active" = true ] && [ "$refresh" = "$1" ] && [ "$scale" = "$SCALE" ]
+}
+
+# Serialise: hotplug events can fire several runs at once. Later runs wait, then
+# find the state already correct and return.
+exec 9>"${XDG_RUNTIME_DIR:-/tmp}/dock-apply.lock"
+flock -w 120 9 || { log "could not get lock"; exit 1; }
+
+if [ -z "$(state)" ]; then
+    log "monitor not connected, nothing to do"
+    exit 0
+fi
+if good "$WANT_REFRESH"; then
+    log "already $MODE scale $SCALE"
+    exit 0
+fi
+
+sleep 2 # let the link settle after hotplug
+for i in $(seq "$ATTEMPTS"); do
+    [ -n "$(state)" ] || { log "monitor disappeared, stopping"; exit 0; }
+    # Enabling straight at 160Hz is rejected (EINVAL) after the output was off:
+    # bring it up at 60Hz first, then raise the mode.
+    read -r active _ <<<"$(state)"
+    if [ "$active" != true ]; then
+        swaymsg output "\"$DESC\"" enable mode "$FALLBACK_MODE" scale "$SCALE" >/dev/null 2>&1
+        sleep 1
+    fi
+    out=$(swaymsg output "\"$DESC\"" mode "$MODE" scale "$SCALE" 2>&1)
+    sleep 1
+    if good "$WANT_REFRESH"; then
+        log "applied $MODE scale $SCALE (attempt $i)"
+        exit 0
+    fi
+    log "attempt $i/$ATTEMPTS failed: $(tr -d '\n' <<<"$out") state=[$(state)]"
+done
+
+# 160Hz never took: a working 60Hz picture beats a black screen.
+swaymsg output "\"$DESC\"" enable mode "$FALLBACK_MODE" scale "$SCALE" >/dev/null 2>&1
+log "gave up on $MODE, fell back to $FALLBACK_MODE state=[$(state)]"
+exit 1
