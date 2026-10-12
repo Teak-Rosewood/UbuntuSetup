@@ -1,0 +1,13 @@
+#!/bin/bash
+# Power menu using wofi (replaces the rofi/hyprctl version)
+
+choice=$(printf '%s\n' "Lock" "Logout" "Sleep" "Restart" "Power Off" \
+    | wofi --dmenu --prompt "" --width 220 --height 230 --cache-file /dev/null)
+
+case "$choice" in
+    "Lock")      swaylock -f ;;
+    "Logout")    swaymsg exit ;;
+    "Sleep")     systemctl suspend ;;
+    "Restart")   systemctl reboot ;;
+    "Power Off") systemctl poweroff ;;
+esac

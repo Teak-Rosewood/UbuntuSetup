@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Sway (Hybrid GPU)
+Comment=Sway on Intel iGPU with NVIDIA outputs
+Exec=/usr/local/bin/sway-session
+Type=Application
+DesktopNames=sway

@@ -1,0 +1,209 @@
+# Sway config (ported from i3/config)
+# Reload with $mod+Shift+c. Validate with: sway -C
+
+set $mod Mod4
+set $term kitty
+set $menu wofi --show drun
+set $scripts ~/.config/sway/scripts
+
+font pango:JetBrainsMono Nerd Font 10
+
+# Colours (same palette as the i3 config)
+set $bg-color #2f343f
+set $inactive-bg-color #2f343f
+set $text-color #f3f4f5
+set $inactive-text-color #676E7D
+set $urgent-bg-color #E53935
+
+# --- Look: flat, no blur/shadows/transparency/animations ---
+default_border pixel 1
+default_floating_border pixel 1
+hide_edge_borders smart
+gaps inner 1
+gaps outer 1
+focus_follows_mouse yes
+
+client.focused          $bg-color $bg-color $text-color $bg-color $text-color
+client.focused_inactive $inactive-bg-color $inactive-bg-color $inactive-text-color $inactive-bg-color $inactive-bg-color
+client.unfocused        $inactive-bg-color $inactive-bg-color $inactive-text-color $inactive-bg-color $inactive-bg-color
+client.urgent           $urgent-bg-color $urgent-bg-color $text-color $urgent-bg-color $urgent-bg-color
+
+# Desktop wallpaper lives with the Sway config repository.
+output * bg /home/blank/projects/UbuntuSetup/sway/wallpapers/desktop.jpg fill
+
+# --- Outputs are handled dynamically by kanshi (see kanshi/config) ---
+
+# --- Input ---
+input type:keyboard {
+    xkb_layout us
+}
+input type:pointer {
+    accel_profile adaptive
+    pointer_accel -0.8
+}
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+}
+
+# --- Basics ---
+floating_modifier $mod normal
+bindsym $mod+Return exec $term
+bindsym $mod+x kill
+bindsym $mod+d exec $menu
+
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r exec killall -SIGUSR2 waybar
+bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit Sway and end this session?' -B 'Yes, exit' 'swaymsg exit'
+
+# --- Focus / move (vim keys and arrows) ---
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# --- Layout ---
+bindsym $mod+n splith
+bindsym $mod+v splitv
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+bindsym $mod+a focus parent
+
+# --- Workspaces ---
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6:Spotify"
+set $ws7 "7:Social"
+set $ws8 "8:Code"
+set $ws9 "9:Project"
+set $ws10 "10:Web"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Send the current workspace to the next monitor
+bindsym $mod+m move workspace to output right
+
+# --- Resize mode ---
+mode "resize" {
+    bindsym h resize shrink width 25px
+    bindsym j resize grow height 25px
+    bindsym k resize shrink height 25px
+    bindsym l resize grow width 25px
+    bindsym Left resize shrink width 25px
+    bindsym Down resize grow height 25px
+    bindsym Up resize shrink height 25px
+    bindsym Right resize grow width 25px
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# --- Window assignment (same apps as i3) ---
+assign [app_id="spotify"] workspace $ws6
+assign [class="Spotify"] workspace $ws6
+assign [app_id="discord"] workspace $ws7
+assign [class="discord"] workspace $ws7
+assign [app_id="code"] workspace $ws8
+assign [class="Code"] workspace $ws8
+assign [app_id="google-chrome"] workspace $ws10
+assign [class="Google-chrome"] workspace $ws10
+
+# Small helper windows float instead of tiling
+for_window [app_id="pavucontrol"] floating enable, resize set 800 500
+for_window [app_id="blueman-manager"] floating enable
+for_window [app_id="nm-connection-editor"] floating enable
+for_window [app_id="wdisplays"] floating enable
+for_window [title="^Firefox — Sharing Indicator$"] floating enable
+
+# --- Audio / brightness / media keys ---
+bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioPause exec playerctl pause
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioPrev exec playerctl previous
+
+# --- Screenshots (grim + slurp) ---
+bindsym Print exec $scripts/screenshot full
+bindsym $mod+Shift+s exec $scripts/screenshot area
+
+# --- Lock, clipboard history, power menu, display GUI ---
+bindsym $mod+Shift+x exec swaylock -f
+bindsym $mod+Shift+v exec cliphist list | wofi --dmenu | cliphist decode | wl-copy
+bindsym $mod+Shift+p exec $scripts/power-menu
+bindsym $mod+Shift+d exec wdisplays
+
+# --- Bar ---
+bar {
+    swaybar_command waybar
+}
+
+# --- Startup ---
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK
+exec /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+exec kanshi
+exec mako
+exec nm-applet --indicator
+exec blueman-applet
+exec wl-paste --watch cliphist store
+exec wlsunset -t 4500 -T 6500 -S 07:00 -s 19:00
+exec swayidle -w \
+    timeout 300 'swaylock -f' \
+    timeout 330 'swaymsg "output * power off"' \
+    resume 'swaymsg "output * power on"' \
+    timeout 900 'systemctl suspend' \
+    before-sleep 'swaymsg "output * power on"; swaylock -f' \
+    after-resume 'swaymsg "output * power on"'
+
+# Optional autostart apps (the i3 config launched these)
+# exec discord
+# exec spotify
+# exec google-chrome
+
+include /etc/sway/config.d/*

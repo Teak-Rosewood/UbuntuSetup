@@ -1,0 +1,23 @@
+#!/bin/bash
+# screenshot full|area : saves to ~/Pictures/Screenshots and copies to clipboard
+
+dir="$HOME/Pictures/Screenshots"
+mkdir -p "$dir"
+file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+case "$1" in
+    full)
+        grim "$file" || exit 1
+        ;;
+    area)
+        region=$(slurp) || exit 0
+        grim -g "$region" "$file" || exit 1
+        ;;
+    *)
+        echo "usage: $0 full|area" >&2
+        exit 1
+        ;;
+esac
+
+wl-copy < "$file"
+notify-send -t 2000 "Screenshot saved" "$file"

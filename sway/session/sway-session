@@ -1,0 +1,30 @@
+#!/bin/bash
+# Session launcher for the Sway entry in GDM.
+#
+# Hybrid Intel + NVIDIA laptop: Sway renders on the Intel iGPU (low power) and
+# the NVIDIA GPU is only used to scan out the HDMI monitor. DRM card numbers
+# change between boots, so the cards are looked up by PCI vendor instead.
+
+intel="" nvidia=""
+for card in /sys/class/drm/card[0-9]*; do
+    [ -e "$card/device/vendor" ] || continue
+    case "$(cat "$card/device/vendor")" in
+        0x8086) intel="/dev/dri/${card##*/}" ;;
+        0x10de) nvidia="/dev/dri/${card##*/}" ;;
+    esac
+done
+
+devices="$intel"
+[ -n "$nvidia" ] && devices="${devices:+$devices:}$nvidia"
+[ -n "$devices" ] && export WLR_DRM_DEVICES="$devices"
+
+export XDG_CURRENT_DESKTOP=sway
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=sway
+# Hardware cursors flicker on NVIDIA-driven outputs
+export WLR_NO_HARDWARE_CURSORS=1
+export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM="wayland;xcb"
+export ELECTRON_OZONE_PLATFORM_HINT=auto
+
+exec sway --unsupported-gpu "$@"

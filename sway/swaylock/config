@@ -1,0 +1,13 @@
+color=0f1115
+image=/home/blank/projects/UbuntuSetup/sway/wallpapers/lockscreen.jpg
+scaling=fill
+font=JetBrainsMono Nerd Font 12
+indicator-radius=80
+indicator-thickness=6
+ring-color=2f343f
+key-hl-color=66bb6a
+bs-hl-color=e53935
+inside-color=14161b
+line-color=00000000
+text-color=f3f4f5
+show-failed-attempts

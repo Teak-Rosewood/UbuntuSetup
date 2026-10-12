@@ -1,0 +1,17 @@
+#!/bin/bash
+# Display menu: eye saver (wlsunset, applies to all outputs) and display layout
+
+if pgrep -x wlsunset >/dev/null; then eye="Eye saver: ON  (click to turn off)"; else eye="Eye saver: OFF (click to turn on)"; fi
+
+choice=$(printf '%s\n' "$eye" "Display layout (wdisplays)" \
+    | wofi --dmenu --prompt "" --width 340 --height 130 --cache-file /dev/null)
+
+case "$choice" in
+    Eye*)
+        if pgrep -x wlsunset >/dev/null; then
+            pkill -x wlsunset
+        else
+            setsid wlsunset -t 4500 -T 4600 -S 03:00 -s 03:01 -d 1 >/dev/null 2>&1 &
+        fi ;;
+    Display*) wdisplays ;;
+esac
