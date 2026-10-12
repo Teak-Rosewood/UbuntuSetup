@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Sway (NVIDIA render)
+Comment=Sway rendering on the NVIDIA GPU
+Exec=env SWAY_RENDER=nvidia /usr/local/bin/sway-session
+Type=Application
+DesktopNames=sway

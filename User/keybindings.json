@@ -15,6 +15,15 @@
         "command": "workbench.action.terminal.kill",
         "when": "terminalFocus"
     },
+    {
+        "key": "ctrl+shift+l",
+        "command": "workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "-editor.action.selectHighlights",
+        "when": "editorFocus"
+    },
     // FILE TREE
     {
         "command": "workbench.action.toggleSidebarVisibility",
@@ -158,5 +167,9 @@
     {
         "key": "ctrl+alt+i",
         "command": "workbench.panel.chat.view.copilot.focus"
+    },
+    {
+        "key": "ctrl+alt+c",
+        "command": "claude-vscode.focus"
     }
 ]

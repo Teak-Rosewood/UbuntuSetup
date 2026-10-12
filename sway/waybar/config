@@ -46,7 +46,7 @@
         },
         "tooltip-format": "{desc}, {volume}%",
         "scroll-step": 5,
-        "on-click": "pavucontrol",
+        "on-click": "pavucontrol -t 3",
         "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
     },
 
@@ -78,8 +78,8 @@
 
     "custom/displays": {
         "format": "󰍹",
-        "tooltip-format": "Displays (wdisplays)",
-        "on-click": "wdisplays"
+        "tooltip-format": "Displays / eye saver",
+        "on-click": "~/.config/sway/scripts/display-menu"
     },
 
     "custom/power": {

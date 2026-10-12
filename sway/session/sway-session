@@ -14,8 +14,14 @@ for card in /sys/class/drm/card[0-9]*; do
     esac
 done
 
-devices="$intel"
-[ -n "$nvidia" ] && devices="${devices:+$devices:}$nvidia"
+# SWAY_RENDER=nvidia renders on the NVIDIA GPU (no cross-GPU copy for HDMI,
+# higher power use). Default renders on Intel.
+if [ "${SWAY_RENDER:-}" = "nvidia" ] && [ -n "$nvidia" ]; then
+    devices="$nvidia${intel:+:$intel}"
+else
+    devices="$intel"
+    [ -n "$nvidia" ] && devices="${devices:+$devices:}$nvidia"
+fi
 [ -n "$devices" ] && export WLR_DRM_DEVICES="$devices"
 
 export XDG_CURRENT_DESKTOP=sway

@@ -111,5 +111,54 @@ sudo snap install spotify
 ```
 ### Visual Studio Code
 ```bash
-sudo snap install code --classic
+# installed as the Microsoft .deb (not the snap)
+wget -O /tmp/code.deb 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64'
+sudo apt install /tmp/code.deb
 ```
+Restore settings, keybindings, snippets and all extensions (pinned versions) with
+`User/install.sh`. API keys (`chatLanguageModels.json`) and Settings Sync state are
+not stored in this repo. After installing or removing extensions, refresh the list:
+`code --list-extensions --show-versions > User/extensions.txt`.
+
+## Restore a machine
+Run in this order after a fresh Ubuntu install and `git clone` of this repo:
+```bash
+~/projects/UbuntuSetup/install.sh              # dotfiles: bash, git, GTK, mime, hypr (no sudo)
+~/projects/UbuntuSetup/sway/install.sh         # Sway + waybar, kanshi, scripts (sudo)
+sudo ~/projects/UbuntuSetup/system/install.sh  # NVIDIA/wifi module options, extra GDM sessions
+sudo ~/projects/UbuntuSetup/docker/install.sh  # Docker Engine
+~/projects/UbuntuSetup/User/install.sh         # VS Code settings + all extensions
+```
+Then set the kernel command line from `system/grub-cmdline.txt` in
+`/etc/default/grub` and run `sudo update-grub` (not automated on purpose).
+
+### Packages
+- `packages/apt-manual.txt`: everything installed by hand with apt (185 entries, includes
+  Ubuntu's own picks). Restore with
+  `grep -v '^#' packages/apt-manual.txt | xargs sudo apt-get install -y`. If a package is
+  missing on a newer release, apt stops, so remove that line and retry.
+- `packages/apt-sources/`: Microsoft Edge and VS Code repos. Copy to `/etc/apt/sources.list.d/`
+  and fetch the signing key:
+  `curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft.gpg`
+  (the Edge file expects `/usr/share/keyrings/microsoft-edge.gpg`, the same key under that name).
+- `packages/npm-global.txt`: global npm packages (`npm i -g $(cat packages/npm-global.txt)`).
+- `packages/conda-qc.yml`: the `qc` conda env (`conda env create -f packages/conda-qc.yml`).
+- Other toolchains, installed by hand: Miniconda and NVM (sections above), Rust via rustup,
+  Go (1.26), Bun (also an npm global), uv.
+
+### Desktop
+- `hypr/`: Hyprland config. Hyprland itself was built from source into `/usr/local`
+  and is currently broken on this machine (`libdisplay-info.so.1` missing), so
+  rebuild it before relying on this session.
+- Themes and icons live in `~/.themes` and `~/.icons` (Flat-Remix GTK, Flat-Remix and
+  Bibata-Modern-Ice icons, about 670 MB). They are not stored here; reinstall them from the
+  upstream projects. GTK is set to Adwaita-dark.
+
+### Deliberately not stored (secrets or machine state)
+API keys (`~/.freellmapi-key`, VS Code `chatLanguageModels.json`), SSH and GPG keys,
+`~/.claude*`, Docker credentials, browser profiles, shell history, VS Code Settings Sync
+state. Re-create or sign in again on a new machine.
+
+### Known stale notes above
+The "Battery Manager" section installs TLP, but this machine runs `power-profiles-daemon`
+(TLP is not installed). The `fish/` config is kept for reference; the login shell is bash.

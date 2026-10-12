@@ -1,0 +1,5 @@
+
+[Default Applications]
+inode/directory=thunar.desktop
+application/x-wayland-gnome-saved-search=thunar.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop

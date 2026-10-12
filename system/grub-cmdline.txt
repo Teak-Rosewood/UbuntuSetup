@@ -1,0 +1,4 @@
+# GRUB_CMDLINE_LINUX in /etc/default/grub (this laptop is Intel + NVIDIA hybrid).
+# The live file repeats the nouveau/nvidia flags twice; once each is equivalent.
+# After editing: sudo update-grub
+GRUB_CMDLINE_LINUX="rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nvidia-drm.modeset=1 rcutree.rcu_idle_gp_delay=1"

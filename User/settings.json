@@ -148,9 +148,7 @@
         "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
     },
     "javascript.updateImportsOnFileMove.enabled": "always",
-    "notebook.lineNumbers": "on",
     "git.enableSmartCommit": true,
-    "github.copilot.advanced": {},
     "[css]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -172,5 +170,12 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "[markdown]": {
         "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-    }
+    },
+    "explorer.confirmPasteNative": false,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "chat.editing.confirmEditRequestRemoval": false,
+    "claudeCode.preferredLocation": "sidebar",
+    "chat.viewSessions.orientation": "stacked",
+    "notebook.lineNumbers": "on",
+    "claudeCode.hideOnboarding": true
 }
